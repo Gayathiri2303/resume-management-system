@@ -1,4 +1,4 @@
-from functools import lru_cache
+﻿from functools import lru_cache
 from typing import List
 from pathlib import Path
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -46,7 +46,7 @@ class Settings(BaseSettings):
     GROQ_API_KEY: str = ""
     GEMINI_API_KEY: str = ""
 
-    TESSERACT_CMD: str = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
+    TESSERACT_CMD: str = "tesseract"
     OCR_LANGUAGE: str = "eng"
 
     STORAGE_PROVIDER: str = "supabase"
