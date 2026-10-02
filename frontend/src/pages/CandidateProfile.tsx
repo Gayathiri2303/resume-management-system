@@ -19,7 +19,7 @@ import {
 } from 'lucide-react'
 import { api, ApiError } from '../lib/api'
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000'
+const API_BASE = import.meta.env.VITE_API_URL || 'https://resume-management-backend-docker.onrender.com'
 
 interface Contact {
   email: string | null

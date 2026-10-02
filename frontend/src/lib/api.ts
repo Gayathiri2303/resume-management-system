@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://localhost:8000'
+const API_BASE_URL = 'https://resume-management-backend-docker.onrender.com'
 
 class ApiError extends Error {
   status: number
