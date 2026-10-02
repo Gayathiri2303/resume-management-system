@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import {
-  CheckCircle2, Loader2, XCircle, Clock, AlertTriangle, Search, Filter, ChevronDown, RefreshCw, Trash2
+  CheckCircle2, Loader2, XCircle, Clock, AlertTriangle, Search, Filter, ChevronDown, RefreshCw
 } from 'lucide-react'
 import { api, ApiError } from '../lib/api'
 

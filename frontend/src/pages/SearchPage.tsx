@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
-  Sparkles, Search, ChevronDown, Filter, X, Eye, MapPin, Briefcase
+  Sparkles, Search, ChevronDown, Filter, Eye
 } from 'lucide-react'
 import { api, ApiError } from '../lib/api'
 
