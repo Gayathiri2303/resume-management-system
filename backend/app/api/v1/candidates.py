@@ -30,6 +30,8 @@ from app.utils.helpers import format_experience
 
 router = APIRouter()
 
+ALLOWED_GENDERS = ("male", "female", "other")
+
 
 def _experience_display(months: int) -> str:
     return format_experience(months)
@@ -39,6 +41,7 @@ class RecruiterFieldsUpdate(BaseModel):
     custom_role: Optional[str] = Field(None, max_length=200)
     custom_location: Optional[str] = Field(None, max_length=150)
     custom_specifications: Optional[str] = None
+    gender: Optional[str] = Field(None, max_length=20)
 
 
 @router.get("", response_model=dict)
@@ -335,6 +338,7 @@ async def get_candidate(
         custom_role=candidate.custom_role,
         custom_location=candidate.custom_location,
         custom_specifications=candidate.custom_specifications,
+        gender=candidate.gender,
         status=candidate.status,
         needs_review=candidate.needs_review,
         source=candidate.source,
@@ -387,7 +391,11 @@ async def update_recruiter_fields(
         raise HTTPException(status_code=404, detail="Candidate not found")
 
     for key, value in payload.model_dump(exclude_unset=True).items():
-        cleaned = (value or "").strip() or None  # empty text clears the field
+        if key == "gender":
+            # only the 3 dropdown values are accepted; empty / anything else clears it
+            cleaned = value if value in ALLOWED_GENDERS else None
+        else:
+            cleaned = (value or "").strip() or None  # empty text clears the field
         setattr(candidate, key, cleaned)
 
     await db.commit()

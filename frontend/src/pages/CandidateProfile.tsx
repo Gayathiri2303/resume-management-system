@@ -19,7 +19,7 @@ import {
 } from 'lucide-react'
 import { api, ApiError } from '../lib/api'
 
-const API_BASE = import.meta.env.VITE_API_URL || 'https://resume-management-backend-docker.onrender.com'
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 
 interface Contact {
   email: string | null
@@ -121,6 +121,12 @@ const STATUS_OPTIONS = [
   'on_hold',
 ]
 
+const GENDER_LABELS: Record<string, string> = {
+  male: 'Male',
+  female: 'Female',
+  other: 'Others',
+}
+
 const statusStyles: Record<string, string> = {
   new: 'bg-blue-600/20 text-blue-400',
   under_review: 'bg-amber-600/20 text-amber-400',
@@ -171,6 +177,7 @@ export default function CandidateProfile() {
   const [editRole, setEditRole] = useState('')
   const [editLocation, setEditLocation] = useState('')
   const [editSpecs, setEditSpecs] = useState('')
+  const [editGender, setEditGender] = useState('')
   const [savingFields, setSavingFields] = useState(false)
 
   const loadCandidate = (showSpinner = false) => {
@@ -197,6 +204,7 @@ export default function CandidateProfile() {
     setEditRole(candidate.custom_role || '')
     setEditLocation(candidate.custom_location || '')
     setEditSpecs(candidate.custom_specifications || '')
+    setEditGender(candidate.gender || '')
     setEditing(true)
   }
 
@@ -210,6 +218,7 @@ export default function CandidateProfile() {
           custom_role: editRole,
           custom_location: editLocation,
           custom_specifications: editSpecs,
+          gender: editGender,
         }
       )
       setCandidate(updated)
@@ -469,6 +478,19 @@ export default function CandidateProfile() {
                   className={`${inputClass} resize-none`}
                 />
               </div>
+              <div>
+                <label className="block text-xs text-slate-500 mb-1">Gender</label>
+                <select
+                  value={editGender}
+                  onChange={(e) => setEditGender(e.target.value)}
+                  className={inputClass}
+                >
+                  <option value="">Not specified</option>
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                  <option value="other">Others</option>
+                </select>
+              </div>
               <div className="flex gap-2 pt-1">
                 <button
                   onClick={handleSaveFields}
@@ -491,7 +513,10 @@ export default function CandidateProfile() {
               <Field label="Custom role" value={candidate.custom_role} />
               <Field label="Custom location" value={candidate.custom_location} />
               <Field label="Specifications" value={candidate.custom_specifications} />
-              <Field label="Gender" value={candidate.gender} />
+              <Field
+                label="Gender"
+                value={candidate.gender ? GENDER_LABELS[candidate.gender] || candidate.gender : null}
+              />
               <Field
                 label="Source"
                 value={candidate.source ? formatStatus(candidate.source) : null}
@@ -691,9 +716,7 @@ function Field({ label, value }: { label: string; value: string | null | undefin
   return (
     <div>
       <p className="text-xs text-slate-500">{label}</p>
-      <p className={`text-sm capitalize-first ${value ? 'text-slate-200' : 'text-slate-600'}`}>
-        {value || 'Not set'}
-      </p>
+      <p className={`text-sm ${value ? 'text-slate-200' : 'text-slate-600'}`}>{value || 'Not set'}</p>
     </div>
   )
 }
