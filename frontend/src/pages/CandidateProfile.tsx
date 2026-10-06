@@ -96,6 +96,7 @@ interface CandidateDetail {
   custom_role: string | null
   custom_location: string | null
   custom_specifications: string | null
+  gender: string | null
   source: string | null
   contacts: Contact[]
   skills: Skill[]
@@ -490,6 +491,7 @@ export default function CandidateProfile() {
               <Field label="Custom role" value={candidate.custom_role} />
               <Field label="Custom location" value={candidate.custom_location} />
               <Field label="Specifications" value={candidate.custom_specifications} />
+              <Field label="Gender" value={candidate.gender} />
               <Field
                 label="Source"
                 value={candidate.source ? formatStatus(candidate.source) : null}

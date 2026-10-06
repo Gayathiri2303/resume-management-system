@@ -66,6 +66,7 @@ class Candidate(Base):
     custom_role: Mapped[Optional[str]] = mapped_column(String(200), nullable=True)
     custom_location: Mapped[Optional[str]] = mapped_column(String(150), nullable=True)
     custom_specifications: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    gender: Mapped[Optional[str]] = mapped_column(String(20), nullable=True)
 
     # Status & quality
     status: Mapped[str] = mapped_column(

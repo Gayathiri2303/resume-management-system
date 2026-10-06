@@ -1,11 +1,10 @@
 import json
 from typing import Any, Dict, List, Optional
 
-from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status
+from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
 from pydantic import BaseModel
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
 
 from app.api.deps import get_current_user
 from app.core.config import get_settings
@@ -23,6 +22,13 @@ from app.services.storage_service import storage_service
 router = APIRouter()
 settings = get_settings()
 
+ALLOWED_GENDERS = ("male", "female", "other")
+
+
+def _clean_gender(value: Optional[str]) -> Optional[str]:
+    """Only accept the three dropdown values; anything else is ignored."""
+    return value if value in ALLOWED_GENDERS else None
+
 
 @router.post("/upload")
 async def upload_resumes(
@@ -32,6 +38,7 @@ async def upload_resumes(
     custom_specifications: Optional[str] = Form(None),
     notes: Optional[str] = Form(None),
     source: Optional[str] = Form("manual_upload"),
+    gender: Optional[str] = Form(None),
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
@@ -55,6 +62,7 @@ async def upload_resumes(
         "custom_specifications": custom_specifications,
         "notes": notes,
         "source": source or "manual_upload",
+        "gender": _clean_gender(gender),
     }
 
     results = []
@@ -128,7 +136,8 @@ async def resolve_duplicate(
 ):
     action = payload.action
     pending = payload.pending or {}
-    custom = payload.custom_options or pending.get("custom_options") or {}
+    custom = dict(payload.custom_options or pending.get("custom_options") or {})
+    custom["gender"] = _clean_gender(custom.get("gender"))
 
     if action == "cancel":
         key = pending.get("file_key")
@@ -159,9 +168,9 @@ async def resolve_duplicate(
 
     if action == "create_new":
         candidate = await create_candidate_from_extraction(
-            db, 
-            extraction, 
-            custom=custom, 
+            db,
+            extraction,
+            custom=custom,
             source=custom.get("source", "manual_upload"),
             user_id=current_user.id,
         )
@@ -219,6 +228,9 @@ async def resolve_duplicate(
             candidate.custom_location = custom["custom_location"]
         if custom.get("custom_specifications"):
             candidate.custom_specifications = custom["custom_specifications"]
+        if custom.get("gender"):
+            candidate.gender = custom["gender"]
+
         note_text = (custom.get("notes") or "").strip()
         if note_text:
             db.add(CandidateNote(candidate_id=candidate.id, user_id=current_user.id, note=note_text))

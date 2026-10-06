@@ -139,6 +139,7 @@ class CandidateDetail(BaseModel):
     custom_role: Optional[str] = None
     custom_location: Optional[str] = None
     custom_specifications: Optional[str] = None
+    gender: Optional[str] = None
     status: str
     needs_review: bool = False
     source: Optional[str] = None

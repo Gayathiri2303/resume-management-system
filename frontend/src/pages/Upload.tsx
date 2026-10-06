@@ -62,6 +62,7 @@ export default function Upload() {
   const [customSpecs, setCustomSpecs] = useState('')
   const [notes, setNotes] = useState('')
   const [source, setSource] = useState('manual_upload')
+  const [gender, setGender] = useState('') // GENDER (1/4): remembers the dropdown choice
 
   // Duplicate modal state
   const [duplicateItem, setDuplicateItem] = useState<UploadResultItem | null>(null)
@@ -104,6 +105,7 @@ export default function Upload() {
     if (customLocation.trim()) formData.append('custom_location', customLocation.trim())
     if (customSpecs.trim()) formData.append('custom_specifications', customSpecs.trim())
     if (notes.trim()) formData.append('notes', notes.trim())
+    if (gender) formData.append('gender', gender) // GENDER (2/4): sent with the upload
     formData.append('source', source || 'manual_upload')
 
     try {
@@ -142,6 +144,7 @@ export default function Upload() {
           custom_location: customLocation.trim() || undefined,
           custom_specifications: customSpecs.trim() || undefined,
           notes: notes.trim() || undefined,
+          gender: gender || undefined, // GENDER (3/4): sent when resolving a duplicate
           source,
         },
       }
@@ -305,6 +308,21 @@ export default function Upload() {
               <option value="linkedin">LinkedIn</option>
               <option value="website">Website</option>
               <option value="walk_in">Walk-in</option>
+            </select>
+          </div>
+
+          {/* GENDER (4/4): the dropdown people can see */}
+          <div>
+            <label className="block text-sm text-slate-400 mb-1.5">Gender</label>
+            <select
+              value={gender}
+              onChange={(e) => setGender(e.target.value)}
+              className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500 transition"
+            >
+              <option value="">Not specified</option>
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+              <option value="other">Others</option>
             </select>
           </div>
         </div>

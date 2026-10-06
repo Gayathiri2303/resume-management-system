@@ -122,6 +122,7 @@ async def create_candidate_from_extraction(
         custom_role=custom.get("custom_role"),
         custom_location=custom.get("custom_location"),
         custom_specifications=custom.get("custom_specifications"),
+        gender=custom.get("gender") if custom.get("gender") in ("male", "female", "other") else None,
         status=CandidateStatus.NEW.value,
         needs_review=bool(data.get("needs_review")),
         source=source,
