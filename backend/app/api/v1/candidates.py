@@ -53,6 +53,7 @@ async def list_candidates(
     max_experience: Optional[int] = None,
     skill: Optional[str] = None,
     needs_review: Optional[bool] = None,
+    gender: Optional[str] = None,  # male | female | other | unspecified
     page: int = Query(1, ge=1),
     page_size: int = Query(20, ge=1, le=100),
     current_user: User = Depends(get_current_user),
@@ -79,6 +80,10 @@ async def list_candidates(
         query = query.where(Candidate.total_experience_months <= max_experience)
     if needs_review is not None:
         query = query.where(Candidate.needs_review == needs_review)
+    if gender == "unspecified":
+        query = query.where(Candidate.gender.is_(None))
+    elif gender in ALLOWED_GENDERS:
+        query = query.where(Candidate.gender == gender)
     if skill:
         # subquery instead of JOIN, so a candidate with many matching skills is not counted twice
         query = query.where(

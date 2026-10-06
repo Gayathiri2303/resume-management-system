@@ -32,6 +32,14 @@ const STATUS_OPTIONS = [
   'interview_scheduled', 'interviewed', 'selected', 'rejected', 'on_hold',
 ]
 
+// GENDER (1/6): labels used in the dropdown and in the filter chip
+const GENDER_LABELS: Record<string, string> = {
+  male: 'Male',
+  female: 'Female',
+  other: 'Others',
+  unspecified: 'Not specified',
+}
+
 const statusStyles: Record<string, string> = {
   new: 'bg-blue-600/20 text-blue-400',
   under_review: 'bg-amber-600/20 text-amber-400',
@@ -57,6 +65,7 @@ export default function Candidates() {
   const [minExp, setMinExp] = useState('')
   const [maxExp, setMaxExp] = useState('')
   const [needsReviewOnly, setNeedsReviewOnly] = useState(false)
+  const [gender, setGender] = useState('all')
   const [showFilters, setShowFilters] = useState(false)
 
   const [candidates, setCandidates] = useState<Candidate[]>([])
@@ -69,6 +78,7 @@ export default function Candidates() {
 
   const activeFilterCount = [
     statusFilter !== 'all',
+    gender !== 'all', // GENDER (2/6): counts as an active filter
     locationFilter.trim() !== '',
     skillFilter.trim() !== '',
     minExp !== '',
@@ -78,6 +88,7 @@ export default function Candidates() {
 
   const clearAllFilters = () => {
     setStatusFilter('all')
+    setGender('all') // GENDER (3/6): reset with "Clear All"
     setLocationFilter('')
     setSkillFilter('')
     setMinExp('')
@@ -93,6 +104,7 @@ export default function Candidates() {
       const params = new URLSearchParams()
       if (search) params.set('q', search)
       if (statusFilter !== 'all') params.set('status', statusFilter)
+      if (gender !== 'all') params.set('gender', gender) // GENDER (4/6): sent to the backend
       if (locationFilter.trim()) params.set('location', locationFilter.trim())
       if (skillFilter.trim()) params.set('skill', skillFilter.trim())
       if (minExp !== '') params.set('min_experience', String(Number(minExp) * 12))
@@ -115,7 +127,8 @@ export default function Candidates() {
   useEffect(() => {
     const timeout = setTimeout(fetchCandidates, 300)
     return () => clearTimeout(timeout)
-  }, [search, statusFilter, locationFilter, skillFilter, minExp, maxExp, needsReviewOnly])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [search, statusFilter, gender, locationFilter, skillFilter, minExp, maxExp, needsReviewOnly]) // GENDER (5/6): reload when it changes
 
   const toggleOne = (id: number) => {
     setSelected((prev) => {
@@ -217,6 +230,22 @@ export default function Candidates() {
               </select>
             </div>
 
+            {/* GENDER (6/6): the dropdown people can see */}
+            <div>
+              <label className="block text-xs text-slate-400 mb-1.5">Gender</label>
+              <select
+                value={gender}
+                onChange={(e) => setGender(e.target.value)}
+                className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500"
+              >
+                <option value="all">All Genders</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="other">Others</option>
+                <option value="unspecified">Not specified</option>
+              </select>
+            </div>
+
             <div>
               <label className="block text-xs text-slate-400 mb-1.5">Location</label>
               <input
@@ -283,6 +312,12 @@ export default function Candidates() {
                   <span className="px-2.5 py-1 bg-blue-600/20 text-blue-300 rounded-lg text-xs flex items-center gap-1">
                     Status: {formatStatus(statusFilter)}
                     <button onClick={() => setStatusFilter('all')}><X className="w-3 h-3" /></button>
+                  </span>
+                )}
+                {gender !== 'all' && (
+                  <span className="px-2.5 py-1 bg-blue-600/20 text-blue-300 rounded-lg text-xs flex items-center gap-1">
+                    Gender: {GENDER_LABELS[gender] || gender}
+                    <button onClick={() => setGender('all')}><X className="w-3 h-3" /></button>
                   </span>
                 )}
                 {locationFilter && (
