@@ -75,5 +75,4 @@ class Settings(BaseSettings):
 @lru_cache
 def get_settings() -> Settings:
     s = Settings()
-    print(f"FINAL DATABASE_URL being used = {s.DATABASE_URL}")
     return s
